@@ -9,7 +9,7 @@ export interface CacheSetFn {
 }
 
 export interface CacheStrategy {
-  check(key: string): Promise<Cache>;
+  check(key: string): Promise<Cache | undefined>;
   set(path: string, result: any): Promise<void>;
 }
 
