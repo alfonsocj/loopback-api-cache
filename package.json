@@ -12,7 +12,9 @@
     "pretest": "npm run build",
     "test": "lb-mocha \"dist/__tests__/unit/**/*.js\" \"dist/__tests__/integration/**/*.js\" \"dist/__tests__/acceptance/**/*.js\"",
     "unit": "lb-mocha \"dist/__tests__/unit/**/*.js\"",
-    "verify": "npm pack && tar xf loopback-api-cache*.tgz && tree package && npm run clean"  },
+    "verify": "npm pack && tar xf loopback-api-cache*.tgz && tree package && npm run clean",
+    "prepublish": "npm run build"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/alfonsocj/loopback-api-cache.git"
