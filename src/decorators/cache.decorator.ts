@@ -6,7 +6,7 @@ export interface CacheMetadata {
   options?: Object;
 }
 
-export function cache(ttl: number, options?: Object) {
+export function cache(ttl: number = 60000, options?: Object) {
   return MethodDecoratorFactory.createDecorator<CacheMetadata>(
     CACHE_METADATA_KEY,
     {
