@@ -15,7 +15,7 @@ npm install --save loopback-api-cache
 
 ## How to use it
 
-Stary by creating a Model for our cache.
+Start by creating a Model for the cache.
 It should have `id: string`, `data: any` and `ttl: number` fields.
 
 ```sh
@@ -101,23 +101,18 @@ Decorate your controller methods with `@cache(ttl)` to be able to cache the resp
 ```ts
 // src/controllers/user.controller.ts
 import { repository } from '@loopback/repository';
-import { inject } from '@loopback/context';
 import { get, param } from '@loopback/rest';
 import { cache } from 'loopback-api-cache';
 import { UserRepository } from '../repositories';
 
 export class UserController {
-  constructor(
-    @repository(UserRepository) protected userRepository: UserRepository
-  ) {}
+  constructor(@repository(UserRepository) protected userRepository: UserRepository) {}
 
   // caching response for 60 seconds
   @cache(60)
   @get('/user/:id')
-  user(
-    @param.path.string('id') id: string
-  ): Promise<User> {
-    return this.userRepository.findById(id)
+  user(@param.path.string('id') id: string): Promise<User> {
+    return this.userRepository.findById(id);
   }
 }
 ```
@@ -126,16 +121,16 @@ Next, implement a cache strategy provider.
 
 ```ts
 // src/providers/cache-strategy.provider.ts
-import { CacheBindings, CacheMetadata, CacheStrategy } from 'loopback-api-cache';
-import { ValueOrPromise, Provider, inject } from '@loopback/core';
+import { inject, Provider, ValueOrPromise } from '@loopback/core';
 import { repository } from '@loopback/repository';
+import { CacheBindings, CacheMetadata, CacheStrategy } from 'loopback-api-cache';
 import { CacheRepository } from '../repositories';
 
 export class CacheStrategyProvider implements Provider<CacheStrategy | undefined> {
   constructor(
     @inject(CacheBindings.METADATA)
     private metadata: CacheMetadata,
-    @repository(CacheRepository) protected cacheRepo: CacheRepository,
+    @repository(CacheRepository) protected cacheRepo: CacheRepository
   ) {}
 
   value(): ValueOrPromise<CacheStrategy | undefined> {
@@ -165,17 +160,8 @@ invoking the corresponding methods at the right time during the request handling
 
 ```ts
 // src/sequence.ts
-import {
-  RestBindings,
-  SequenceHandler,
-  FindRoute,
-  ParseParams,
-  InvokeMethod,
-  Send,
-  Reject,
-  RequestContext,
-} from '@loopback/rest';
-import {inject} from '@loopback/context';
+import { inject } from '@loopback/context';
+import { FindRoute, InvokeMethod, ParseParams, Reject, RequestContext, RestBindings, Send, SequenceHandler } from '@loopback/rest';
 import { CacheBindings, CacheCheckFn, CacheSetFn } from 'loopback-api-cache';
 
 const SequenceActions = RestBindings.SequenceActions;
@@ -188,12 +174,12 @@ export class MySequence implements SequenceHandler {
     @inject(SequenceActions.SEND) public send: Send,
     @inject(SequenceActions.REJECT) public reject: Reject,
     @inject(CacheBindings.CACHE_CHECK_ACTION) protected checkCache: CacheCheckFn,
-    @inject(CacheBindings.CACHE_SET_ACTION) protected setCache: CacheSetFn,
+    @inject(CacheBindings.CACHE_SET_ACTION) protected setCache: CacheSetFn
   ) {}
 
   async handle(context: RequestContext) {
     try {
-      const {request, response} = context;
+      const { request, response } = context;
       const route = this.findRoute(request);
       const args = await this.parseParams(request, route);
 
@@ -206,10 +192,9 @@ export class MySequence implements SequenceHandler {
 
       const result = await this.invoke(route, args);
       this.send(response, result);
-      
+
       // Important part added to set cache with the result
       this.setCache(request, result);
-
     } catch (error) {
       this.reject(context, error);
     }
@@ -229,12 +214,11 @@ Finally, put it all together in your application class:
 
 ```ts
 // src/application.ts
-import {BootMixin, Binding, Booter} from '@loopback/boot';
-import {RestApplication, RestServer, RestBindings} from '@loopback/rest';
+import { BootMixin } from '@loopback/boot';
+import { ApplicationConfig } from '@loopback/core';
+import { RestApplication, RestBindings, RestServer } from '@loopback/rest';
 import { CacheBindings, CacheComponent } from 'loopback-api-cache';
-import {MyAuthStrategyProvider} from './providers/auth-strategy.provider';
-import {MySequence} from './sequence';
-import {ApplicationConfig} from '@loopback/core';
+import { MySequence } from './sequence';
 
 export class MyApp extends BootMixin(RestApplication) {
   constructor(options?: ApplicationConfig) {
