@@ -144,8 +144,17 @@ export class CacheStrategyProvider implements Provider<CacheStrategy | undefined
     }
 
     return {
-      check: (path: string) => this.cacheRepo.get(path),
-      set: (path: string, result: any) => this.cacheRepo.set(path, result, { ttl: this.metadata.ttl }),
+      check: (path: string) =>
+        this.cacheRepo.get(path).catch(err => {
+          console.error(err);
+          return undefined;
+        }),
+      set: async (path: string, result: any) => {
+        const cache = new Cache({ id: result.id, data: result, ttl: this.metadata.ttl });
+        this.cacheRepo.set(path, cache, { ttl: ttlInMs }).catch(err => {
+          console.error(err);
+        });
+      },
     };
   }
 }
@@ -191,7 +200,7 @@ export class MySequence implements SequenceHandler {
       // Important part added to check for cache and respond with that if found
       const cache = await this.checkCache(request);
       if (cache) {
-        this.send(response, cache);
+        this.send(response, cache.data);
         return;
       }
 
