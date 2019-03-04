@@ -16,10 +16,10 @@ export class CacheSetProvider implements Provider<CacheSetFn> {
   async action(request: Request, result: any): Promise<void> {
     const cacheStrategy = await this.getCacheStrategy();
 
-    if (!cacheStrategy) {
-      return undefined;
+    if (!cacheStrategy || !result) {
+      return;
     }
 
-    return await cacheStrategy.set(request.path, result);
+    await cacheStrategy.set(request.path, result);
   }
 }
