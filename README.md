@@ -112,7 +112,7 @@ export class UserController {
   ) {}
 
   // caching response for 60 seconds
-  @cache(60000)
+  @cache(60)
   @get('/user/:id')
   user(
     @param.path.string('id') id: string
