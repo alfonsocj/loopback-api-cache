@@ -38,7 +38,7 @@ lb4 model
 ...
 ```
 
-At the end you whould have something like
+At the end you would have something like
 
 ```ts
 // src/models/cache.model.ts
