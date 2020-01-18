@@ -20,6 +20,6 @@ export class CacheCheckProvider implements Provider<CacheCheckFn> {
       return undefined;
     }
 
-    return await cacheStrategy.check(request.path);
+    return await cacheStrategy.check(request);
   }
 }

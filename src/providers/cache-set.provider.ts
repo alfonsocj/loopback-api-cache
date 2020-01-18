@@ -20,6 +20,6 @@ export class CacheSetProvider implements Provider<CacheSetFn> {
       return;
     }
 
-    await cacheStrategy.set(request.path, result);
+    await cacheStrategy.set(request, result);
   }
 }
