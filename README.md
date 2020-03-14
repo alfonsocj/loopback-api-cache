@@ -10,7 +10,7 @@ using the @cache() decorator.
 ## Installation
 
 ```shell
-npm install --save loopback-api-cache
+npm install --save git+https://git@github.com/getlarge/loopback-api-cache#build
 ```
 
 ## How to use it

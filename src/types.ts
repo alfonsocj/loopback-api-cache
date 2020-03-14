@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {Request} from '@loopback/rest';
 
 export interface CacheCheckFn {
@@ -18,4 +19,4 @@ export interface Cache {
   data: any;
   ttl: number;
 }
-
+/* eslint-enable @typescript-eslint/no-explicit-any */
