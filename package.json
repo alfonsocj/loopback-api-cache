@@ -1,6 +1,6 @@
 {
   "name": "loopback-api-component",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A loopback component for cache support",
   "main": "index.js",
   "scripts": {
