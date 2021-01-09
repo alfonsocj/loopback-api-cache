@@ -10,7 +10,7 @@ using the @cache() decorator.
 ## Installation
 
 ```shell
-npm install --save loopback-api-cache
+npm install --save git+https://git@github.com/getlarge/loopback-api-cache#build
 ```
 
 ## How to use it
@@ -71,7 +71,7 @@ export class Cache extends Entity {
 }
 ```
 
-Now create the cache datasource and repository of your choice.
+Now create the cache datasource ( Key Value based ) and repository of your choice.
 We are going to be using Redis for this example.
 
 ```sh
@@ -124,6 +124,7 @@ Next, implement a cache strategy provider.
 import { inject, Provider, ValueOrPromise } from '@loopback/core';
 import { repository } from '@loopback/repository';
 import { CacheBindings, CacheMetadata, CacheStrategy } from 'loopback-api-cache';
+import { Cache } from '../models';
 import { CacheRepository } from '../repositories';
 
 export class CacheStrategyProvider implements Provider<CacheStrategy | undefined> {
@@ -138,15 +139,28 @@ export class CacheStrategyProvider implements Provider<CacheStrategy | undefined
       return undefined;
     }
 
+    const getCacheKey = (req: Request): string => {
+      let reqParams = {path: req.path};
+      if (req.query) {
+        reqParams = {...reqParams, ...req.query};
+      }
+      const buff = Buffer.from(JSON.stringify(reqParams));
+      const cacheKey = buff.toString('base64');
+      return cacheKey;
+    };
+
     return {
-      check: (path: string) =>
+      check: (req: Request) => {
+        const cacheKey = getCacheKey(req);
         this.cacheRepo.get(path).catch(err => {
           console.error(err);
           return undefined;
         }),
-      set: async (path: string, result: any) => {
-        const cache = new Cache({ id: result.id, data: result, ttl: this.metadata.ttl });
-        this.cacheRepo.set(path, cache, { ttl: ttlInMs }).catch(err => {
+      set: async (req: Request, result: any) => {
+        const cacheKey = getCacheKey(req);
+        const ttl = this.metadata.ttl && this.metadata.ttl > 0 ? this.metadata.ttl : 0;
+        const cache = new Cache({ id: result.id, data: result, ttl });
+        this.cacheRepo.set(path, cache, { ttl: ttl * 1000 }).catch(err => {
           console.error(err);
         });
       },
@@ -218,6 +232,7 @@ import { BootMixin } from '@loopback/boot';
 import { ApplicationConfig } from '@loopback/core';
 import { RestApplication, RestBindings, RestServer } from '@loopback/rest';
 import { CacheBindings, CacheComponent } from 'loopback-api-cache';
+import { CacheStrategyProvider } from './providers';
 import { MySequence } from './sequence';
 
 export class MyApp extends BootMixin(RestApplication) {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {Request} from '@loopback/rest';
 
 export interface CacheCheckFn {
@@ -9,8 +10,8 @@ export interface CacheSetFn {
 }
 
 export interface CacheStrategy {
-  check(key: string): Promise<Cache | undefined>;
-  set(path: string, result: any): Promise<void>;
+  check(req: Request): Promise<Cache | undefined>;
+  set(req: Request, result: any): Promise<void>;
 }
 
 export interface Cache {
@@ -18,4 +19,4 @@ export interface Cache {
   data: any;
   ttl: number;
 }
-
+/* eslint-enable @typescript-eslint/no-explicit-any */

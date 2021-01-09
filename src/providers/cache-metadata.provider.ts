@@ -1,8 +1,9 @@
 import {CoreBindings} from '@loopback/core';
 import {Constructor, Provider, inject} from '@loopback/context';
-import { getCacheMetadata, CacheMetadata } from "../decorators";
+import {getCacheMetadata, CacheMetadata} from '../decorators';
 
-export class CacheMetadataProvider implements Provider<CacheMetadata | undefined> {
+export class CacheMetadataProvider
+  implements Provider<CacheMetadata | undefined> {
   constructor(
     @inject(CoreBindings.CONTROLLER_CLASS, {optional: true})
     private readonly controllerClass: Constructor<{}>,
@@ -11,7 +12,7 @@ export class CacheMetadataProvider implements Provider<CacheMetadata | undefined
   ) {}
 
   value(): CacheMetadata | undefined {
-    if(!this.controllerClass || !this.methodName) return;
+    if (!this.controllerClass || !this.methodName) return;
     return getCacheMetadata(this.controllerClass, this.methodName);
   }
 }

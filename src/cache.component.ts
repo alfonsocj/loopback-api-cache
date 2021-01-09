@@ -1,6 +1,10 @@
-import { CacheBindings } from './keys';
 import {Component, ProviderMap} from '@loopback/core';
-import { CacheMetadataProvider, CacheCheckProvider, CacheSetProvider } from './providers';
+import {CacheBindings} from './keys';
+import {
+  CacheMetadataProvider,
+  CacheCheckProvider,
+  CacheSetProvider,
+} from './providers';
 
 export class CacheComponent implements Component {
   providers?: ProviderMap;
